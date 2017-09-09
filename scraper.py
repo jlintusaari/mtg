@@ -4,8 +4,7 @@
 
 Usage
 -----
-python3 suomi24scraper.py -h
-python3 suomi24scraper.py [num_pages] -v
+python3 scraper.py
 
 """
 
@@ -50,8 +49,10 @@ class ScryfallScraper:
         # Saved by their id
         self.cards = {}
 
-    def scrape_cards(self):
+    def scrape_cards(self, start_page=None):
         next_url = 'https://api.scryfall.com/cards'
+        if start_page is not None:
+            next_url += '?page={}'.format(start_page)
 
         while True:
             if next_url is None:
@@ -78,7 +79,7 @@ class ScryfallScraper:
             image_uri = card['image_uri']
 
             if not image_uri:
-                logger.info('No image for %d' % id)
+                logger.info('No image for %s' % id)
                 continue
 
             image_fn = os.path.join(self.image_path, id + '.' + self._get_image_extension(image_uri))
@@ -90,7 +91,7 @@ class ScryfallScraper:
     def _get_image_extension(self, image_uri):
         ext = image_uri.split('/')[-1]
         ext = ext.split('?')[0]
-        return ext.split('.')[1]
+        return ext.split('.')[-1]
 
     def fetch_url(self, url, decode=True):
         t = time.time()
@@ -112,39 +113,9 @@ class ScryfallScraper:
         return content
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(
-        description='Suomi 24 scraper'
-    )
-
-    parser.add_argument("-d", "--to_date", nargs=1, default=None, type=str, help="To which date to scrape.")
-    parser.add_argument("-o", "--operator", nargs=1, default=['elisan-liittymat'], type=str,
-                        help="Operator name in Suomi24. Possible values include: "
-                             "dna-, "
-                             "elisan-liittymat, "
-                             "muut-liittymat, "
-                             "saunalahti, "
-                             "sonera-, "
-                             "tele-finland.")
-    parser.add_argument("-v", "--verbose", help="Increase output verbosity", action="store_true")
-    return parser.parse_args()
-
-
 if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
-    #parser = parse_args()
-
-    #args = parse_args()
-    #if args.verbose:
-    #    logging.basicConfig(level=logging.INFO)
-
-    #to_date = datetime.date.today() - datetime.timedelta(days=7) if args.to_date is None \
-    #    else parse_finnish_date(args.to_date[0])
-    #operator = args.operator
-
-    #scraper = Suomi24Scraper(operator=operator[0])
-    #scraper.scrape(to_date=to_date)
 
     scraper = ScryfallScraper()
     scraper.scrape_cards()
