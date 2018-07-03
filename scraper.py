@@ -4,7 +4,7 @@
 
 Usage
 -----
-python3 scraper.py -h
+python3 scraper.py
 
 """
 
@@ -16,7 +16,6 @@ import json
 import time
 import pickle
 
-from bs4 import BeautifulSoup as BS
 import requests
 import re
 import glob
@@ -48,7 +47,6 @@ class ScryfallScraper:
         self.last_fetch_time = None
         self.fetch_delay = .1
 
-        # TODO: open the cards file
         # Saved by their id
         self.cards = {}
 
@@ -179,24 +177,12 @@ class ScryfallScraper:
         return content
 
 
-# TODO: finalize
-def parse_args():
-    parser = argparse.ArgumentParser(
-        description='Suomi 24 scraper'
-    )
-
-    parser.add_argument("-d", "--cards", nargs=1, default=None, type=str, help="Fetch card dictionary from the server and save it to a file.")
-    parser.add_argument("-o", "--images", nargs=1, default=None, type=str,
-                        help="Fetch card images for all cards in the local card dictionary file.")
-    #parser.add_argument("-v", "--verbose", help="Increase output verbosity", action="store_true")
-    return parser.parse_args()
-
-
 if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
 
-    # Fetch images for all cards in the local cards dictionary file
+    # Fetch images for all cards
     scraper = ScryfallScraper()
     scraper.load_cards()
     scraper.fetch_images()
+
